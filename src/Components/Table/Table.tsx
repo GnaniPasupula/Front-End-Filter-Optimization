@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './Table.css';
 import Multiselect from 'multiselect-react-dropdown';
+import { useDispatch, useSelector } from 'react-redux';
+import {FiltersState}  from '../../Reducers/filtersReducer';
 
 interface CSVDataRow {
   number: string;
@@ -12,6 +14,11 @@ interface CSVDataRow {
 }
 
 const Table: React.FC = () => {
+
+  const dispatch = useDispatch();
+  const filtersr = useSelector((state: FiltersState) => state.filters);
+
+
   const [data, setTableData] = useState<CSVDataRow[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState<{ [key: string]: string[] }>({});
@@ -28,7 +35,7 @@ const Table: React.FC = () => {
         for (let i = 1; i < lines.length; i++) {
           const values = lines[i].split(',');
           const number = parseInt(values[0], 10);
-          console.log(number);
+          // console.log(number);
           const mod3 = (number % 3).toString();
           const mod4 = (number % 4).toString();
           const mod5 = (number % 5).toString();
@@ -82,6 +89,13 @@ const Table: React.FC = () => {
       ...filters,
       [columnName]: selectedOptions.map((option: any) => option.value),
     });
+
+    const newFilters = {
+      ...filtersr,
+      [columnName]: selectedOptions.map((option: any) => option.value),
+    };
+
+    dispatch({ type: 'SET_FILTERS', payload: newFilters });
   };
 
   const filterOptions = (columnName: string) => {
